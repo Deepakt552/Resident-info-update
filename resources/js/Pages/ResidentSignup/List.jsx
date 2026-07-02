@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
+import ResidentSignupEmailModal from '@/Components/ResidentSignupEmailModal';
 
 const List = ({ residentSignups, filters }) => {
     const [search, setSearch] = useState(filters.search || '');
@@ -114,7 +115,7 @@ const List = ({ residentSignups, filters }) => {
             preConfirm: () => {
                 return new Promise((resolve, reject) => {
                     setDeletingId(id);
-                    
+
                     // Optimistic update: Remove item from list immediately
                     setSignups(prev => ({
                         ...prev,
@@ -129,7 +130,7 @@ const List = ({ residentSignups, filters }) => {
                         preserveState: true,
                         onSuccess: () => {
                             toast.success('Resident signup deleted successfully!');
-                            
+
                             // Refresh the list to get updated pagination
                             router.get(
                                 '/resident-signup/list',
@@ -297,9 +298,8 @@ const List = ({ residentSignups, filters }) => {
                                         signups.data.map((signup, index) => (
                                             <tr
                                                 key={signup.id}
-                                                className={`border-b border-gray-100/50 dark:border-gray-700/50 hover:bg-coral/5 dark:hover:bg-coral/10 transition-all duration-300 odd:bg-white/40 dark:odd:bg-gray-800/20 ${
-                                                    deletingId === signup.id ? 'opacity-50 pointer-events-none' : ''
-                                                }`}
+                                                className={`border-b border-gray-100/50 dark:border-gray-700/50 hover:bg-coral/5 dark:hover:bg-coral/10 transition-all duration-300 odd:bg-white/40 dark:odd:bg-gray-800/20 ${deletingId === signup.id ? 'opacity-50 pointer-events-none' : ''
+                                                    }`}
                                             >
                                                 <td className="px-4 py-2 text-sm text-gray-900 dark:text-white font-medium">
                                                     {signups.from + index}
@@ -327,7 +327,7 @@ const List = ({ residentSignups, filters }) => {
                                                             className="inline-flex items-center gap-2 px-4 py-2  text-navy dark:bg-navy/20 dark:text-gray-300 rounded-full hover:bg-navy hover:text-white hover:shadow-lg hover:scale-[1.03] transition-all duration-300 text-sm font-medium"
                                                         >
                                                             <Eye className="w-5 h-5" />
-                                                            
+
                                                         </Link>
 
                                                         {/* PDF Button */}
@@ -338,9 +338,8 @@ const List = ({ residentSignups, filters }) => {
                                                             className="inline-flex items-center gap-1.5 px-3 py-2  text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-full hover:bg-emerald-600 hover:text-white hover:shadow-lg hover:scale-[1.03] transition-all duration-300 text-xs font-medium"
                                                         >
                                                             <FileDown className="w-5 h-5" />
-                                                            
-                                                        </a>
 
+                                                        </a>
                                                         {/* Delete Button */}
                                                         <button
                                                             onClick={() => handleDelete(signup.id, signup.signup_uid)}
@@ -352,8 +351,13 @@ const List = ({ residentSignups, filters }) => {
                                                             ) : (
                                                                 <Trash2 className="w-5 h-5" />
                                                             )}
-                                                            
+
                                                         </button>
+                                                        
+                                                        <ResidentSignupEmailModal
+                                                            id={signup.id}
+                                                            buttonText=""
+                                                        />
                                                     </div>
                                                 </td>
                                             </tr>
@@ -389,11 +393,10 @@ const List = ({ residentSignups, filters }) => {
                                                 key={index}
                                                 onClick={() => handlePageChange(link.url)}
                                                 disabled={!link.url}
-                                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                                                    link.active
+                                                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${link.active
                                                         ? 'bg-coral text-white shadow-lg hover:bg-coral/90'
                                                         : 'bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm text-navy dark:text-gray-300 hover:bg-coral/10 dark:hover:bg-coral/20 border border-gray-300 dark:border-gray-600'
-                                                } disabled:opacity-40 disabled:cursor-not-allowed`}
+                                                    } disabled:opacity-40 disabled:cursor-not-allowed`}
                                             >
                                                 {link.label}
                                             </button>

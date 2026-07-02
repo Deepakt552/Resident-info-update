@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MailLog;
 use App\Models\Property;
 use App\Models\ResidentSignup;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -15,6 +16,8 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 use App\Services\EmailService;
 use App\Jobs\SendResidentSignupEmailJob;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ResidentSignupMail;
 
 class ResidentSignupController extends Controller
 {
@@ -497,7 +500,6 @@ class ResidentSignupController extends Controller
      * @param int $id
      * @return bool
      */
-
     /**
      * Stream PDF in browser
      * 
@@ -625,6 +627,119 @@ class ResidentSignupController extends Controller
             ]);
 
             return redirect()->back()->with('error', 'Failed to download PDF. Please try again.');
+        }
+    }
+
+    public function sendEmail(Request $request)
+    {
+        // Validate request
+        $validated = $request->validate([
+            'id' => 'required|exists:resident_signups,id',
+            'email' => 'required|email'
+        ]);
+        $propertyId = '';
+        try {
+            // Fetch resident signup with property relationship
+            $residentSignup = ResidentSignup::with('property')->findOrFail($validated['id']);
+            $propertyId = $residentSignup->property_id;
+            // Prepare email data
+            $emailData = [
+                'property_name' => $residentSignup->property->name ?? 'N/A',
+                'unit_number' => $residentSignup->unitno,
+                'signup_uid' => $residentSignup->signup_uid,
+                'tenant_names' => collect($residentSignup->tenants)
+                    ->pluck('name')
+                    ->filter()
+                    ->implode(', ')
+            ];
+
+            // Send email
+            Mail::to($validated['email'])
+                ->send(new ResidentSignupMail(
+                    $emailData,
+                    $residentSignup->pdf_path
+                ));
+
+            // Log success
+            Log::info('Resident signup email sent successfully', [
+                'resident_signup_id' => $residentSignup->id,
+                'signup_uid' => $residentSignup->signup_uid,
+                'sent_to' => $validated['email']
+            ]);
+
+            // Get the full PDF path
+            $pdfPath = $residentSignup->pdf_path;
+            if ($pdfPath) {
+                // Remove 'storage/' prefix if present
+                $pdfPath = str_replace('storage/', '', $pdfPath);
+                $pdfFullPath = storage_path('app/public/' . $pdfPath);
+
+                // Check if file actually exists
+                if (!file_exists($pdfFullPath)) {
+                    throw new Exception('PDF file not found at: ' . $pdfFullPath);
+                }
+
+                // Extract filename for logging
+                $pdfFileName = basename($pdfPath);
+            } else {
+                throw new Exception('PDF path is null for resident signup ID: ' . $residentSignup->id);
+            }
+
+            // Log primary email success
+            $this->logEmail(
+                 $pdfFileName,
+                'mail sent mannual ' . $validated['email'],
+                $propertyId,
+                1,
+                null
+            );
+            return redirect()->back()->with('success', 'Email sent successfully!');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()->with('error', 'Validation failed: ' . $e->errors());
+
+        } catch (\Exception $e) {
+            // Log error
+            Log::error('Failed to send resident signup email', [
+                'error' => $e->getMessage(),
+                'resident_signup_id' => $request->id ?? null
+            ]);
+            $this->logEmail(
+                $pdfFileName,
+                'mail sent failed',
+                $propertyId,
+                0,
+                $e->getMessage()
+            );
+            return redirect()->back()->with('error', 'Failed to send email: ' . $e->getMessage());
+        }
+    }
+    private function logEmail(string $document, string $action, int $propertyId, int $status, ?string $errorMessage = null): void
+    {
+        try {
+            MailLog::create([
+                'document' => $document,
+                'action' => $action,
+                'user_id' => auth()->id() ?? null,
+                'property_id' => $propertyId,
+                'status' => $status,
+                'sent_at' => now(),
+                'error_message' => $errorMessage,
+            ]);
+
+            Log::info('Email logged in mail_logs', [
+                'document' => $document,
+                'action' => $action,
+                'property_id' => $propertyId,
+                'status' => $status
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to log email in mail_logs', [
+                'error' => $e->getMessage(),
+                'document' => $document,
+                'action' => $action
+            ]);
         }
     }
 }

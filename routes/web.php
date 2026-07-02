@@ -46,6 +46,8 @@ Route::middleware('auth')->group(function () {
 
 // New routes for listing and view
 Route::get('/resident-signup/list', [ResidentSignupController::class, 'list'])->name('resident-signup.list');
+ Route::post('/resident-signups/send-email', [ResidentSignupController::class, 'sendEmail'])
+        ->name('resident-signups.send-email');
 
 });
 
