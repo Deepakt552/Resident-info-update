@@ -18,6 +18,7 @@ import {
     FileText,
     CheckSquare
 } from 'lucide-react';
+import ResidentSignupEmailModal from '@/Components/ResidentSignupEmailModal';
 
 const View = ({ residentSignup }) => {
     // Format date
@@ -71,9 +72,15 @@ const View = ({ residentSignup }) => {
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
+                                <span className="bg-coral/10 text-coral rounded-full text-xs font-medium">
+                                    <ResidentSignupEmailModal
+                                        id={residentSignup.id}
+                                        buttonText="Send Mail"
+                                    />
+                                </span>
                                 <Link
                                     href="/resident-signup/list" className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold bg-coral/10 text-coral dark:bg-coral/20">
-                                     <Users className="w-3.5 h-3.5" /> Go To List
+                                    <Users className="w-3.5 h-3.5" /> Go To List
                                 </Link>
                                 <span className="bg-coral/10 text-coral rounded-full px-4 py-1.5 text-xs font-medium">
                                     #{residentSignup.signup_uid}
