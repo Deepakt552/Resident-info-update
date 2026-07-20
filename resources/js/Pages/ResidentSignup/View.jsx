@@ -19,6 +19,8 @@ import {
     CheckSquare
 } from 'lucide-react';
 import ResidentSignupEmailModal from '@/Components/ResidentSignupEmailModal';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 
 const View = ({ residentSignup }) => {
     // Format date
@@ -36,6 +38,24 @@ const View = ({ residentSignup }) => {
         const minutes = String(d.getMinutes()).padStart(2, '0');
         return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} at ${hours}:${minutes}`;
     };
+
+
+    const markAsReadData = async (id) => {
+        const response = await axios.post(`/notifications/${id}/read`);
+        return response.data;
+    }
+    const markAsRead = async (id) => {
+        try {
+            const response = await markAsReadData(id);
+            if (response.success) {
+                // toast.success('Notification marked as read');
+            }
+        } catch (error) {
+            // toast.error('Failed to mark as read');
+            console.error('Failed to mark as read:', error);
+        }
+    };
+    markAsRead(residentSignup.id);
 
     // Get tenant count
     const tenantCount = Array.isArray(residentSignup.tenants) ? residentSignup.tenants.length : 0;

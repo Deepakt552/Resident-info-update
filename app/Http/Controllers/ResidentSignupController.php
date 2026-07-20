@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MailLog;
+use App\Models\Notification;
 use App\Models\Property;
 use App\Models\ResidentSignup;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -46,9 +47,16 @@ class ResidentSignupController extends Controller
 
         $query = $request->input('query');
 
-        $properties = Property::where('name', 'LIKE', '%' . $query . '%')
+        $properties = Property::where('name', 'like', "%{$query}%")
+            ->orWhere('address', 'like', "%{$query}%")
             ->limit(10)
             ->get(['id', 'name', 'address']);
+        // $properties = Property::where('name', 'LIKE', '%' . $query . '%')
+        // $properties = Property::where(function ($q) use ($query) {
+        //     $q->where('name', 'LIKE', '%' . $query . '%')
+        //         ->orWhere('address', 'LIKE', '%' . $query . '%');
+        // })->limit(10)
+        //     ->get(['id', 'name', 'address']);
 
         return response()->json($properties);
     }
@@ -168,9 +176,16 @@ class ResidentSignupController extends Controller
                 'tenants' => $processedTenants,
             ]);
 
+            $notification= Notification::create([
+                'resident_signups_id' => $residentSignup->id,
+                'read' => 0,
+                'read_date' => null,
+            ]);
+
             Log::info('Resident signup record created', [
                 'id' => $residentSignup->id,
-                'signup_uid' => $signupUid
+                'signup_uid' => $signupUid,
+                'Notification '=>$notification->id
             ]);
 
             // Generate PDF - try-catch with detailed logging
@@ -687,7 +702,7 @@ class ResidentSignupController extends Controller
 
             // Log primary email success
             $this->logEmail(
-                 $pdfFileName,
+                $pdfFileName,
                 'mail sent mannual ' . $validated['email'],
                 $propertyId,
                 1,

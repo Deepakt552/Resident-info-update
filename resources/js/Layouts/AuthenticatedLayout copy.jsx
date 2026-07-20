@@ -82,7 +82,7 @@ export default function AuthenticatedLayout({ header, children }) {
             { href: "/users", icon: Users, label: "Users" },
             { href: "/properties", icon: Building2, label: "Properties" },
             { href: "/profile", icon: User, label: "Profile" },
-            
+
         ];
     };
 
@@ -120,15 +120,18 @@ export default function AuthenticatedLayout({ header, children }) {
                 {/* TOP */}
                 <div className="flex items-center justify-between p-2 border-b border-[#22346e]/20 dark:border-[#22346e]/40">
                     <Link href="/dashboard" className="flex items-center gap-2">
-                        <div className="text-[#f34853] dark:text-[#f34853]">
-                            <img
-                                src="/images/Im_logo.png"
-                                alt="Logo"
-                                className="h-16 w-auto"
-                            />
-                            {/* <ApplicationLogo className="h-8 w-auto fill-current" /> */}
-                        </div>
-                        {open && <span className="text-[#22346e] dark:text-white font-bold text-lg hidden sm:inline">PropManage</span>}
+
+                        {open && <>
+                            <div className="text-[#f34853] dark:text-[#f34853]">
+                                <img
+                                    src="/images/Im_logo.png"
+                                    alt="Logo"
+                                    className="h-16 w-auto"
+                                />
+                                {/* <ApplicationLogo className="h-8 w-auto fill-current" /> */}
+                            </div>
+                            <span className="text-[#22346e] dark:text-white font-bold text-lg hidden sm:inline">PropManage</span>
+                        </>}
                     </Link>
 
                     <button

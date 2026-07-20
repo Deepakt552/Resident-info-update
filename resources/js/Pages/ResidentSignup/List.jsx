@@ -180,7 +180,7 @@ const List = ({ residentSignups, filters }) => {
                 <div className="max-w-7xl mx-auto">
 
                     {/* Sticky Header with Glassmorphism */}
-                    <div className="sticky top-0 z-20 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl border-b border-white/20 dark:border-gray-700/30 rounded-t-3xl  px-4 sm:px-6 lg:px-8 py-6 ">
+                    <div className="sticky top-0 z-10 bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl border-b border-white/20 dark:border-gray-700/30 rounded-t-3xl  px-4 sm:px-6 lg:px-8 py-6 ">
                         <div className="max-w-8xl mx-auto flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
                             {/* Left: Icon + Titles */}
                             <div className="flex items-center gap-4">

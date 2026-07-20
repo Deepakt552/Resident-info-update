@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\MailSettingController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\UserController;
@@ -8,6 +9,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\ResidentSignupController;
+use App\Http\Controllers\DashboardController;
 
 // Route::get('/', function () {
 // return Inertia::render('Welcome', [
@@ -20,9 +22,13 @@ use App\Http\Controllers\ResidentSignupController;
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+});
+// Route::get('/dashboard', function () {
+//     return Inertia::render('Dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Route::get('/dashboard', [DashboardController::class, 'index'])
 //     ->middleware(['auth', 'verified'])
@@ -59,5 +65,15 @@ Route::get('/resident-signup/{id}', [ResidentSignupController::class, 'show'])->
 
 // Add this route inside the auth middleware group
 Route::delete('/resident-signup-delete/{id}', [ResidentSignupController::class, 'destroy'])->name('resident-signup.destroy');
+
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Notification routes
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/load-more', [NotificationController::class, 'loadMore'])->name('notifications.load-more');
+    Route::get('/notifications/count', [NotificationController::class, 'count'])->name('notifications.count');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/clear-all', [NotificationController::class, 'clearAll'])->name('notifications.clear-all');
+});
 
 require __DIR__ . '/auth.php';

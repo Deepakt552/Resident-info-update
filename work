@@ -1,0 +1,15 @@
+1)Dashboard work
+    a)D:\project\NoticeResident\app\Http\Controllers\DashboardController.php
+    b)D:\project\NoticeResident\routes\web.php
+    c)D:\project\NoticeResident\resources\js\Components\Dashboard
+    d)D:\project\NoticeResident\resources\js\Pages\Dashboard.jsx
+    e)D:\project\NoticeResident\resources\js\Layouts\AuthenticatedLayout.jsx
+
+2) add notification feature 
+    a)D:\project\NoticeResident\database\migrations\2026_07_20_120828_create_notifications_table.php //07/20/2026
+    b)D:\project\NoticeResident\resources\js\Pages\ResidentSignup\View.jsx  //07/20/2026
+    c)D:\project\NoticeResident\resources\js\Layouts\Notification  //07/20/2026
+    d)D:\project\NoticeResident\app\Http\Controllers\NotificationController.php  //07/20/2026
+    e)D:\project\NoticeResident\app\Models\Notification.php  //07/20/2026
+    f)D:\project\NoticeResident\resources\js\Layouts\AuthenticatedLayout.jsx  //07/20/2026
+
